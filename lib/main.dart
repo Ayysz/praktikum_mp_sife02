@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'materi.dart';
-import 'profile.dart';
+import 'ptm3/latihan_list_view.dart';
 import 'navbar.dart';
 // import 'ptm1.dart';
 
@@ -17,6 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -36,6 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const Navbar()
+      // home: const LatihanListView()
     );
   }
 }
