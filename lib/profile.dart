@@ -19,6 +19,7 @@ class Profile extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 debugPrint("LOGUTT BANG>>");
+                Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: Text('loguttt>>'),
