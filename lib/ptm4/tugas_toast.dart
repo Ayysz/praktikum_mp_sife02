@@ -4,14 +4,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 class TugasToast extends StatelessWidget {
   const TugasToast({super.key});
 
-  final List<String> datamakanan = const [
-    'Nasi Goreng',
-    'Mie Goreng',
-    'Ayam Bakar',
-    'Ikan Bakar',
-    'Sate',
-    'Bakso',
-    'Sop',
+  final List<Map<String, dynamic>> datamakanan = const [
+    {'nama': 'Nasi Goreng', 'icons': Icons.rice_bowl},
+    {'nama': 'Mie Goreng', 'icons': Icons.ramen_dining},
+    {'nama': 'Ayam Bakar', 'icons': Icons.local_dining},
+    {'nama': 'Ikan Bakar', 'icons': Icons.set_meal},
+    {'nama': 'Sate', 'icons': Icons.kebab_dining},
+    {'nama': 'Bakso', 'icons': Icons.soup_kitchen},
+    {'nama': 'Sop', 'icons': Icons.soup_kitchen},
   ];
 
   void _elvBtnOnTap() {
@@ -20,7 +20,7 @@ class TugasToast extends StatelessWidget {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Color.fromRGBO(255, 30, 40, 0.5),
+      backgroundColor: Color.fromRGBO(255, 196, 0, 1),
       webBgColor: "linear-gradient(to right, #96c93d, #00b09b)",
       webPosition: "left",
       textColor: Colors.white,
@@ -57,56 +57,62 @@ class TugasToast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Tugas Toast")),
+      appBar: AppBar(
+        title: const Text("Tugas Toast"),
+        backgroundColor: const Color.fromARGB(255, 255, 153, 0),
+        foregroundColor: Colors.white,
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-            Row(
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 12,
+              top: 20,
+            ),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Column(
-                  children: [
-                    Text("Daftar Menu Makanan Siap Saji", 
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      color: Colors.blue,
-                    )),
-                  ]
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: (){
-                    _elvBtnOnTap();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orangeAccent,
-                    foregroundColor: Colors.white,
+                const Text("Daftar Menu Makanan Siap Saji", 
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blue,
+                  )),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: ElevatedButton(
+                    onPressed: (){
+                      _elvBtnOnTap();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text("Pesan"),
                   ),
-                  child: Text("Pesan"),
                 ),
               ]
             ),
-            SizedBox(height: 12),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: datamakanan.length,
               itemBuilder: (context, index) {
+                final item = datamakanan[index];
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                  child: TextButton(
-                      onPressed: () {
-                        _txtBtnOnTap(context, datamakanan[index]);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          datamakanan[index],
-                          style: const TextStyle(fontSize: 18),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ), 
+                  child: ListTile(
+                    leading: Icon(item['icons'] as IconData, color: Colors.blue),
+                    title: Text(
+                      item['nama'] as String,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                    onTap: () {
+                      _txtBtnOnTap(context, item['nama'] as String);
+                    },
+                  ),
                 );
               },
             ),

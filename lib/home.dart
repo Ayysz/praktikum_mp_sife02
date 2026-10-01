@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
-  const Home({super.key});
+  final VoidCallback onNavigateToMateri;
+  const Home({super.key, required this.onNavigateToMateri});
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -26,7 +27,7 @@ class Home extends StatelessWidget {
             Text('Ini Pembuatan Home dan navbar di pertemuan ke-2 \n matakuliah mobile programming'),
             SizedBox(height: 20),// ini seperti br gtu kalo di html
             ElevatedButton(
-              onPressed: () {},
+              onPressed: onNavigateToMateri,
               child: Text('Jelajahi Materi \n(ini pakai component ElevatedButton)'),
             )
           ],
