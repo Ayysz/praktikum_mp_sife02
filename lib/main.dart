@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'ptm3/latihan_list_view.dart';
 import 'navbar.dart';
 // import 'ptm1.dart';
 
