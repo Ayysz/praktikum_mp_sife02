@@ -1,4 +1,4 @@
-package com.example.praktikum_mp_04sife02_ammar
+package ac.id.unpam.si.praktikum_mp_04sife02
 
 import io.flutter.embedding.android.FlutterActivity
 
