@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm3/latihan_list_view.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm4/alert_toast.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm4/tugas_toast.dart';
+import 'package:praktikum_mp_04sife02_ammar/ptm5/gesture.dart';
+import 'package:praktikum_mp_04sife02_ammar/ptm5/tugas_gesture.dart';
 
 class Materi extends StatelessWidget {
   const Materi({super.key});
@@ -72,25 +74,26 @@ class Materi extends StatelessWidget {
         ]
       },
       {
-        "title": "Pertemuan 3",
-        "icon": Icons.folder,
-        "subItems": [
-          {'title': 'Sub Materi 1', 'page': null, 'icon': Icons.folder_off},
-        ]
-      },
-      {
-        "title": "Pertemuan 4 - List View",
+        "title": "Pertemuan 3 - List View",
         "icon": Icons.list_alt,
         "subItems": [
           {'title': 'Latihan List View', 'page': const LatihanListView(), 'icon': Icons.visibility},
         ]
       },
       {
-        "title": "Pertemuan 5 - Toast dan Alert",
+        "title": "Pertemuan 4 - Toast dan Alert",
         "icon": Icons.notifications_active,
         "subItems": [
           {'title': 'Latihan Toast/Alert', 'page': const AlertToast(), 'icon': Icons.visibility},
           {'title': 'Tugas Alert Pemesanan Makanan', 'page': const TugasToast(), 'icon': Icons.food_bank},
+        ]
+      },
+      {
+        "title": "Pertemuan 5 - Gesture dan State",
+        "icon": Icons.touch_app,
+        "subItems": [
+          {'title': 'Gesture Detector', 'page': const Gesture(), 'icon': Icons.touch_app_outlined},
+          {'title': 'Tugas Gesture Detector', 'page': const TugasGesture(), 'icon': Icons.lightbulb},
         ]
       },
       {

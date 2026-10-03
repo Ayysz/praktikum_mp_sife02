@@ -8,6 +8,7 @@ class Profile extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          spacing: 10,
           children: <Widget>[
             CircleAvatar(
               radius: 50,
