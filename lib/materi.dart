@@ -4,6 +4,7 @@ import 'package:praktikum_mp_04sife02_ammar/ptm4/alert_toast.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm4/tugas_toast.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm5/gesture.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm5/tugas_gesture.dart';
+import 'package:praktikum_mp_04sife02_ammar/ptm6/form.dart';
 
 class Materi extends StatelessWidget {
   const Materi({super.key});
@@ -97,10 +98,10 @@ class Materi extends StatelessWidget {
         ]
       },
       {
-        "title": "Pertemuan 6",
-        "icon": Icons.folder,
+        "title": "Pertemuan 6 - Form",
+        "icon": Icons.task,
         "subItems": [
-          {'title': 'Sub Materi 1', 'page': null, 'icon': Icons.folder_off},
+          {'title': 'Materi Form', 'page': const LearnForm(), 'icon': Icons.add_task},
         ]
       },
       {
