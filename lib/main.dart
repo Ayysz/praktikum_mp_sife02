@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'navbar.dart';
-// import 'ptm1.dart';
+import 'package:praktikum_mp_04sife02_ammar/auth/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,8 +32,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const Navbar()
-      // home: const LatihanListView()
+      home: const LoginPage()
     );
   }
 }
