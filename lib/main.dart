@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:praktikum_mp_04sife02_ammar/auth/login.dart';
+import 'package:praktikum_mp_04sife02_ammar/navbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  // Wajib dipanggil sebelum operasi async di main()
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Cek apakah user sudah pernah login sebelumnya
+  final prefs = await SharedPreferences.getInstance();
+  final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({
+    super.key,
+    required this.isLoggedIn,
+  });
+
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Praktikkum Mobile Progamming',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
@@ -32,7 +47,9 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginPage()
+      home: isLoggedIn 
+        ? const Navbar() 
+        : const LoginPage(),
     );
   }
 }

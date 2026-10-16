@@ -4,6 +4,7 @@ import 'package:praktikum_mp_04sife02_ammar/helpers/db_helper.dart';
 import 'package:praktikum_mp_04sife02_ammar/home.dart';
 import 'package:praktikum_mp_04sife02_ammar/materi.dart';
 import 'package:praktikum_mp_04sife02_ammar/navbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,20 +40,26 @@ class _LoginPageState extends State<LoginPage> {
       if (user == null) {
         throw Exception('Username atau Password salah');
       }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('username', user.username);
+      await prefs.setString('nama', user.nama);
+
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Login berhasil!'),
           backgroundColor: Colors.green,
         ),
       );
-      print("================================================");
-      print(user.toString());
+
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          // builder: (context) => Home(user: user, onNavigateToMateri: onNavigateToMateri),
-          builder: (context) => Home(onNavigateToMateri: () => Navbar()),
+          builder: (context) => Navbar(),
         ),
       );
     } catch (e) {
