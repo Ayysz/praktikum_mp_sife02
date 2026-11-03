@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- WAJIB untuk Pertemuan 8: Izin agar aplikasi boleh mengakses internet/API Supabase -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:label="praktikum_mp_04sife02_ammar"
         android:name="${applicationName}"

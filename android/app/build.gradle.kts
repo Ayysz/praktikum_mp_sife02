@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "ac.id.unpam.si.praktikum_mp_04sife02"
     // compileSdk = flutter.compileSdkVersion
-    compileSdk = 35
+    compileSdk = 36
     
     ndkVersion = flutter.ndkVersion
 
