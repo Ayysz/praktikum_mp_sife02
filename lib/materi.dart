@@ -5,6 +5,7 @@ import 'package:praktikum_mp_04sife02_ammar/ptm4/tugas_toast.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm5/gesture.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm5/tugas_gesture.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm6/form.dart';
+import 'package:praktikum_mp_04sife02_ammar/ptm7/task.dart';
 
 class Materi extends StatelessWidget {
   const Materi({super.key});
@@ -105,10 +106,10 @@ class Materi extends StatelessWidget {
         ]
       },
       {
-        "title": "Pertemuan 7",
-        "icon": Icons.folder,
+        "title": "Pertemuan 7 - SQLite",
+        "icon": Icons.data_array,
         "subItems": [
-          {'title': 'Sub Materi 1', 'page': null, 'icon': Icons.folder_off},
+          {'title': 'Materi SQLite', 'page': const TaskPage(), 'icon': Icons.note},
         ]
       },
       {

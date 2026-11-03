@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:praktikum_mp_04sife02_ammar/auth/register.dart';
 import 'package:praktikum_mp_04sife02_ammar/helpers/db_helper.dart';
-import 'package:praktikum_mp_04sife02_ammar/home.dart';
-import 'package:praktikum_mp_04sife02_ammar/materi.dart';
 import 'package:praktikum_mp_04sife02_ammar/navbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -78,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login'), backgroundColor: Colors.blue),
+      appBar: AppBar(title: const Text('Praktikum MP 04SIFE002'), backgroundColor: Colors.blue),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -88,100 +86,127 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  color: Colors.green,
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(15.0),
-                  child: Text(
-                    'Form Mahasiswa',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  padding: EdgeInsets.all(12.0),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 168, 203, 255),
+                    borderRadius: BorderRadius.all(Radius.circular(15.0))
                   ),
-                ),
-                SizedBox(height: 20),
-
-                TextFormField(
-                  controller: _userNameController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Nama gaboleh kosong';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    labelText: 'Nama Lengkap',
-                    hintText: 'Masukkan Nama Anda',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 20),
-
-                TextFormField(
-                  controller: _passwordController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Password gaboleh kosong';
-                    }
-                    return null;
-                  },
-                  obscureText: _isPasswordHidden,
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      icon: _isPasswordHidden
-                          ? Icon(Icons.visibility_off)
-                          : Icon(Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordHidden = !_isPasswordHidden;
-                        });
-                      },
-                    ),
-                    labelText: 'Password',
-                    hintText: 'Masukkan Password Anda',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                TextButton(
-                  onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RegisterPage(),
+                  child: Column(
+                    children: [
+                      Container(
+                        color: const Color.fromARGB(255, 90, 75, 226),
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(15.0),
+                        child: Text(
+                          'Login',
+                          style: TextStyle(
+                            color: Colors.white, 
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                  child: const Text(
-                    "Belum punya akun? Daftar disini",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
+                      SizedBox(height: 20),
+
+                      TextFormField(
+                        controller: _userNameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Nama gaboleh kosong';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          icon: Icon(Icons.person),
+                          labelText: 'Nama Lengkap',
+                          hintText: 'Masukkan Nama Anda',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+
+                      TextFormField(
+                        controller: _passwordController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password gaboleh kosong';
+                          }
+                          return null;
+                        },
+                        obscureText: _isPasswordHidden,
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: _isPasswordHidden
+                                ? Icon(Icons.visibility_off)
+                                : Icon(Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordHidden = !_isPasswordHidden;
+                              });
+                            },
+                          ),
+                          labelText: 'Password',
+                          hintText: 'Masukkan Password Anda',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+
+                     
+                      
+                      
+                    ],
+                  )
+                ),
+                
+                SizedBox(height: 20),
+                Container(
+                  // alignment: Alignment.centerRight,
+                  width: double.infinity,
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : FloatingActionButton.extended(
+                      onPressed: _handleLogin,
+                      label: const Text('Login'),
+                      icon: _isLoading ? 
+                          const SizedBox(
+                            height: double.infinity,
+                            width: double.infinity,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          ) : 
+                          const Icon(Icons.login),
                     ),
-                  ),
-                )
+                ),
+
+                SizedBox(height: 10),
+                TextButton(
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterPage(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Belum punya akun? Daftar disini",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
               ],
             ),
           ),
         ),
       ),
-      floatingActionButton: _isLoading
-          ? const CircularProgressIndicator()
-          : FloatingActionButton.extended(
-              onPressed: _handleLogin,
-              label: const Text('Login'),
-              icon: _isLoading ? 
-                  const SizedBox(
-                    height: 16,
-                    width: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  ) : 
-                  const Icon(Icons.login),
-            ),
+
     );
   }
 }

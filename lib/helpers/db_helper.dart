@@ -1,17 +1,16 @@
+import 'package:praktikum_mp_04sife02_ammar/models/task_model.dart';
 import 'package:praktikum_mp_04sife02_ammar/models/user_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-
-class DbHelper{
-
+class DbHelper {
   static final DbHelper instance = DbHelper._init();
   static Database? _database;
 
   DbHelper._init();
 
   Future<Database> get database async {
-    if(_database != null) return _database!;
+    if (_database != null) return _database!;
     _database = await _initDB('app_praktikum.db');
     return _database!;
   }
@@ -20,11 +19,7 @@ class DbHelper{
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(
-      path, 
-      version: 1, 
-      onCreate: _createDB
-    );
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   Future _createDB(Database db, int version) async {
@@ -34,12 +29,19 @@ class DbHelper{
         nama TEXT NOT NULL,
         username TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL
-      )
+      );
+
+      CREATE TABLE tugas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        judul TEXT NOT NULL,
+        isi TEXT NOT NULL,
+        is_completed BOOLEAN NOT NULL
+      );
     ''');
   }
 
   Future<int> registerUser(UserModel user) async {
-    final db = await  instance.database;
+    final db = await instance.database;
 
     // validator apa username sudah terdaftar?
     final existing = await db.query(
@@ -48,14 +50,11 @@ class DbHelper{
       whereArgs: [user.username],
     );
 
-    if(existing.isNotEmpty){
+    if (existing.isNotEmpty) {
       throw Exception('Username "${user.username}" sudah digunakan.');
     }
 
-    return await db.insert(
-      'users',
-      user.toMap(),
-    );
+    return await db.insert('users', user.toMap());
   }
 
   Future<UserModel?> loginUser(String username, String password) async {
@@ -80,10 +79,38 @@ class DbHelper{
     return result.map((json) => UserModel.fromMap(json)).toList();
   }
 
+  Future<List<TaskModel>> getAllTask() async {
+    final db = await instance.database;
+    final result = await db.query('tugas');
+    return result.map((json) => TaskModel.fromMap(json)).toList();
+  }
+
+  // Create task
+  Future<void> createTask(TaskModel task) async {
+    final db = await instance.database;
+    await db.insert('tugas', task.toMap());
+  }
+
+  // Update task
+  Future<void> updateTask(TaskModel task) async {
+    final db = await instance.database;
+    await db.update(
+      'tugas',
+      task.toMap(),
+      where: 'id = ?',
+      whereArgs: [task.id],
+    );
+  }
+
+  // Delete task
+  Future<void> deleteTask(int id) async {
+    final db = await instance.database;
+    await db.delete('tugas', where: 'id = ?', whereArgs: [id]);
+  }
+
   // Close database
   Future<void> close() async {
     final db = await instance.database;
     await db.close();
   }
-
 }
