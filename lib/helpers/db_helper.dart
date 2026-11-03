@@ -19,20 +19,29 @@ class DbHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path,
+      version: 4,
+      onCreate: _createDB,
+      onUpgrade: _onUpgradeDB,
+      onOpen: _onOpenDB,
+    );
   }
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE users (
+      CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nama TEXT NOT NULL,
         username TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL
       );
+    ''');
 
-      CREATE TABLE tugas (
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS tugas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT,
         judul TEXT NOT NULL,
         isi TEXT NOT NULL,
         is_completed BOOLEAN NOT NULL
@@ -40,10 +49,47 @@ class DbHelper {
     ''');
   }
 
+  Future _onUpgradeDB(Database db, int oldVersion, int newVersion) async {
+    await _ensureTablesExist(db);
+  }
+
+  Future _onOpenDB(Database db) async {
+    await _ensureTablesExist(db);
+  }
+
+  /// Memastikan tabel `tugas` dan `users` selalu ada dan memiliki struktur lengkap
+  Future _ensureTablesExist(Database db) async {
+    // 1. Buat tabel jika belum ada
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nama TEXT NOT NULL,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+      );
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS tugas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT,
+        judul TEXT NOT NULL,
+        isi TEXT NOT NULL,
+        is_completed BOOLEAN NOT NULL
+      );
+    ''');
+
+    // 2. Pastikan kolom user_id ada jika database lama belum memilikinya
+    try {
+      await db.execute('ALTER TABLE tugas ADD COLUMN user_id TEXT;');
+    } catch (_) {
+      // Kolom sudah ada, abaikan
+    }
+  }
+
   Future<int> registerUser(UserModel user) async {
     final db = await instance.database;
 
-    // validator apa username sudah terdaftar?
     final existing = await db.query(
       'users',
       where: 'username = ?',
@@ -79,9 +125,18 @@ class DbHelper {
     return result.map((json) => UserModel.fromMap(json)).toList();
   }
 
-  Future<List<TaskModel>> getAllTask() async {
+  Future<List<TaskModel>> getAllTask([String? userId]) async {
     final db = await instance.database;
-    final result = await db.query('tugas');
+    final List<Map<String, dynamic>> result;
+    if (userId != null && userId.isNotEmpty) {
+      result = await db.query(
+        'tugas',
+        where: 'user_id = ? OR user_id IS NULL',
+        whereArgs: [userId],
+      );
+    } else {
+      result = await db.query('tugas');
+    }
     return result.map((json) => TaskModel.fromMap(json)).toList();
   }
 

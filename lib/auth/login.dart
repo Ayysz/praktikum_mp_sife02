@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:praktikum_mp_04sife02_ammar/auth/register.dart';
-import 'package:praktikum_mp_04sife02_ammar/helpers/db_helper.dart';
 import 'package:praktikum_mp_04sife02_ammar/navbar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:praktikum_mp_04sife02_ammar/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,7 +12,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _userNameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _isPasswordHidden = true;
@@ -21,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    _userNameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -31,41 +30,46 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _isLoading = true);
     try {
-      final user = await DbHelper.instance.loginUser(
-        _userNameController.text.trim(),
-        _passwordController.text.trim(),
+      await AuthService.instance.login(
+        identifier: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
-      if (user == null) {
-        throw Exception('Username atau Password salah');
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('username', user.username);
-      await prefs.setString('nama', user.nama);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Login berhasil!'),
           backgroundColor: Colors.green,
         ),
       );
 
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Navbar(),
+          builder: (context) => const Navbar(),
         ),
       );
     } catch (e) {
       if (!mounted) return;
+      final errorMessage = e.toString().replaceAll('Exception: ', '');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.red,
+          content: Row(
+            children: [
+              const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  errorMessage,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red.shade700,
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } finally {
@@ -75,8 +79,13 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isSupabase = AuthService.instance.isSupabaseMode;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Praktikum MP 04SIFE002'), backgroundColor: Colors.blue),
+      appBar: AppBar(
+        title: const Text('Praktikum MP 04SIFE002'),
+        backgroundColor: Colors.blue,
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -85,11 +94,64 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // DEV BANNER TOGGLE
                 Container(
-                  padding: EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 168, 203, 255),
-                    borderRadius: BorderRadius.all(Radius.circular(15.0))
+                    color: isSupabase
+                        ? const Color(0xFFE0F2FE)
+                        : const Color(0xFFFEF3C7),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSupabase ? const Color(0xFF38BDF8) : const Color(0xFFFBBF24),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSupabase ? Icons.cloud_done_rounded : Icons.storage_rounded,
+                        color: isSupabase ? Colors.blue.shade700 : Colors.amber.shade900,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          isSupabase
+                              ? 'Mode Auth: Supabase (Online)'
+                              : 'Mode Dev: SQLite (Offline)',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: isSupabase
+                                ? Colors.blue.shade900
+                                : Colors.amber.shade900,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            AuthService.activeMode = isSupabase
+                                ? AuthMode.sqlite
+                                : AuthMode.supabase;
+                          });
+                        },
+                        child: const Text('Ganti Mode'),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  padding: const EdgeInsets.all(12.0),
+                  decoration: const BoxDecoration(
+                    color: Color.fromARGB(255, 168, 203, 255),
+                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
                   ),
                   child: Column(
                     children: [
@@ -98,48 +160,62 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(15.0),
                         child: Text(
-                          'Login',
-                          style: TextStyle(
-                            color: Colors.white, 
+                          isSupabase ? 'Login (Email)' : 'Login (Offline)',
+                          style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       TextFormField(
-                        controller: _userNameController,
+                        controller: _emailController,
+                        keyboardType: isSupabase
+                            ? TextInputType.emailAddress
+                            : TextInputType.text,
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Nama gaboleh kosong';
+                          if (value == null || value.trim().isEmpty) {
+                            return isSupabase
+                                ? 'Email tidak boleh kosong'
+                                : 'Username tidak boleh kosong';
+                          }
+                          if (isSupabase &&
+                              (!value.contains('@') || !value.contains('.'))) {
+                            return 'Format email tidak valid (contoh: user@gmail.com)';
                           }
                           return null;
                         },
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.person),
-                          labelText: 'Nama Lengkap',
-                          hintText: 'Masukkan Nama Anda',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          icon: Icon(isSupabase ? Icons.email : Icons.person),
+                          labelText: isSupabase ? 'Email Pengguna' : 'Username',
+                          hintText: isSupabase
+                              ? 'Masukkan email terdaftar'
+                              : 'Masukkan username',
+                          border: const OutlineInputBorder(),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       TextFormField(
                         controller: _passwordController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Password gaboleh kosong';
+                            return 'Password tidak boleh kosong';
+                          }
+                          if (value.length < 6) {
+                            return 'Password minimal 6 karakter';
                           }
                           return null;
                         },
                         obscureText: _isPasswordHidden,
                         decoration: InputDecoration(
-                          icon: Icon(Icons.lock),
+                          icon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
                             icon: _isPasswordHidden
-                                ? Icon(Icons.visibility_off)
-                                : Icon(Icons.visibility),
+                                ? const Icon(Icons.visibility_off)
+                                : const Icon(Icons.visibility),
                             onPressed: () {
                               setState(() {
                                 _isPasswordHidden = !_isPasswordHidden;
@@ -148,65 +224,53 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           labelText: 'Password',
                           hintText: 'Masukkan Password Anda',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
-                      SizedBox(height: 10),
-
-                     
-                      
-                      
+                      const SizedBox(height: 10),
                     ],
-                  )
-                ),
-                
-                SizedBox(height: 20),
-                Container(
-                  // alignment: Alignment.centerRight,
-                  width: double.infinity,
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : FloatingActionButton.extended(
-                      onPressed: _handleLogin,
-                      label: const Text('Login'),
-                      icon: _isLoading ? 
-                          const SizedBox(
-                            height: double.infinity,
-                            width: double.infinity,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          ) : 
-                          const Icon(Icons.login),
-                    ),
+                  ),
                 ),
 
-                SizedBox(height: 10),
-                TextButton(
-                      onPressed: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterPage(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "Belum punya akun? Daftar disini",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic,
+                const SizedBox(height: 20),
+
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                          backgroundColor: const Color.fromARGB(255, 90, 75, 226),
+                          foregroundColor: Colors.white,
                         ),
+                        onPressed: _handleLogin,
+                        child: const Text('Login'),
                       ),
+
+                const SizedBox(height: 12),
+
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterPage(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Belum punya akun? Daftar disini",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
                     ),
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
-
     );
   }
 }

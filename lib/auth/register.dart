@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:praktikum_mp_04sife02_ammar/helpers/db_helper.dart';
-import 'package:praktikum_mp_04sife02_ammar/models/user_model.dart';
+import 'package:praktikum_mp_04sife02_ammar/services/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -12,9 +11,8 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
 
-  // controller untuk masing masing input
   final _namaController = TextEditingController();
-  final _userNameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -25,45 +23,56 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void dispose() {
     _namaController.dispose();
-    _userNameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  // Fungsi Register
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final String nama = _namaController.text.trim();
-      final newUser = UserModel(
-        nama: nama,
-        username: _userNameController.text.trim(),
+      final message = await AuthService.instance.register(
+        nama: _namaController.text.trim(),
+        identifier: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
-      await DbHelper.instance.registerUser(newUser);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Registrasi berhasil! Silahkan login $nama"),
+          content: Text(message),
           backgroundColor: Colors.green,
+          duration: const Duration(seconds: 4),
         ),
       );
 
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
+      final errorMessage = e.toString().replaceAll('Exception: ', '');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.red,
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  errorMessage,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red.shade700,
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } finally {
@@ -73,6 +82,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isSupabase = AuthService.instance.isSupabaseMode;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Registrasi Akun')),
       body: SafeArea(
@@ -91,44 +102,54 @@ class _RegisterPageState extends State<RegisterPage> {
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Nama gaboleh kosong';
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Nama tidak boleh kosong';
                     }
                     return null;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 TextFormField(
-                  controller: _userNameController,
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.person),
-                    labelText: 'Username',
-                    hintText: 'Masukkan Username Anda',
-                    border: OutlineInputBorder(),
+                  controller: _emailController,
+                  keyboardType: isSupabase
+                      ? TextInputType.emailAddress
+                      : TextInputType.text,
+                  decoration: InputDecoration(
+                    icon: Icon(isSupabase ? Icons.email : Icons.account_circle),
+                    labelText: isSupabase ? 'Email' : 'Username',
+                    hintText: isSupabase
+                        ? 'contoh: nama@gmail.com'
+                        : 'Masukkan username',
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Username gaboleh kosong';
+                    if (value == null || value.trim().isEmpty) {
+                      return isSupabase
+                          ? 'Email tidak boleh kosong'
+                          : 'Username tidak boleh kosong';
+                    }
+                    if (isSupabase &&
+                        (!value.contains('@') || !value.contains('.'))) {
+                      return 'Format email tidak valid';
                     }
                     return null;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 TextFormField(
                   controller: _passwordController,
-                  obscuringCharacter: '*',
                   obscureText: _isPasswordHidden,
                   decoration: InputDecoration(
-                    icon: Icon(Icons.lock),
+                    icon: const Icon(Icons.lock),
                     labelText: 'Password',
-                    hintText: 'Masukkan Password Anda',
-                    border: OutlineInputBorder(),
+                    hintText: 'Minimal 6 karakter',
+                    border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
                       icon: _isPasswordHidden
-                          ? Icon(Icons.visibility_off)
-                          : Icon(Icons.visibility),
+                          ? const Icon(Icons.visibility_off)
+                          : const Icon(Icons.visibility),
                       onPressed: () {
                         setState(() {
                           _isPasswordHidden = !_isPasswordHidden;
@@ -138,27 +159,28 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Password gaboleh kosong';
+                      return 'Password tidak boleh kosong';
+                    }
+                    if (value.length < 6) {
+                      return 'Password minimal 6 karakter';
                     }
                     return null;
                   },
-                  
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 TextFormField(
                   controller: _confirmPasswordController,
-                  obscuringCharacter: "*",
                   obscureText: _isConfirmPasswordHidden,
                   decoration: InputDecoration(
-                    icon: Icon(Icons.lock),
-                    labelText: 'Confirm Password',
-                    hintText: 'Masukkan Confirm Password Anda',
-                    border: OutlineInputBorder(),
+                    icon: const Icon(Icons.lock_outline),
+                    labelText: 'Konfirmasi Password',
+                    hintText: 'Ulangi password',
+                    border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
                       icon: _isConfirmPasswordHidden
-                          ? Icon(Icons.visibility_off)
-                          : Icon(Icons.visibility),
+                          ? const Icon(Icons.visibility_off)
+                          : const Icon(Icons.visibility),
                       onPressed: () {
                         setState(() {
                           _isConfirmPasswordHidden = !_isConfirmPasswordHidden;
@@ -168,45 +190,27 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Confirm Password gaboleh kosong';
+                      return 'Konfirmasi password tidak boleh kosong';
                     }
                     if (value != _passwordController.text) {
-                      return 'Confirm Password tidak cocok';
+                      return 'Password tidak cocok';
                     }
                     return null;
                   },
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 30),
 
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleRegister,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Daftar'),
-                ),
-                SizedBox(height: 20),
-
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     const Text(
-                //       'Sudah punya akun? '
-                //     ),
-                //     TextButton(
-                //       onPressed: () {
-                //         Navigator.pop(context);
-                //       },
-                //       child: const Text('Login'),
-                //     ),
-                //   ],
-                // ),
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: _handleRegister,
+                        child: const Text('Daftar'),
+                      ),
               ],
             ),
           ),

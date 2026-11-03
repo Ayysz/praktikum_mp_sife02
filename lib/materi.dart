@@ -7,6 +7,7 @@ import 'package:praktikum_mp_04sife02_ammar/ptm5/tugas_gesture.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm6/form.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm7/task.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm8/order_page.dart';
+import 'package:praktikum_mp_04sife02_ammar/ptm9/todo_user_page.dart';
 
 class Materi extends StatelessWidget {
   const Materi({super.key});
@@ -118,6 +119,13 @@ class Materi extends StatelessWidget {
         "icon": Icons.cloud_sync,
         "subItems": [
           {'title': 'Kitchen Order Management (Chef)', 'page': const OrderPage(), 'icon': Icons.soup_kitchen},
+        ]
+      },
+      {
+        "title": "Pertemuan 9 - Autentikasi & Sesi",
+        "icon": Icons.lock_person,
+        "subItems": [
+          {'title': 'todo per user', 'page': const TodoUserPage(), 'icon': Icons.checklist_rtl_rounded},
         ]
       },
     ];
