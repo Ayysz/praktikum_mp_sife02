@@ -1,6 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- WAJIB untuk Pertemuan 8: Izin agar aplikasi boleh mengakses internet/API Supabase -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Pertemuan 10: Izin Kamera, Lokasi, dan Notifikasi -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:label="praktikum_mp_04sife02_ammar"
