@@ -1,0 +1,64 @@
+name: Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.5'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        run: |
+          BUILD_NAME="${GITHUB_REF_NAME#v}"
+          if [ -z "$BUILD_NAME" ] || [ "$BUILD_NAME" = "main" ]; then
+            BUILD_NAME="1.0.0"
+          fi
+          flutter build apk --release --build-name="$BUILD_NAME" --build-number="${GITHUB_RUN_NUMBER}"
+
+      - name: Rename APK
+        run: |
+          TAG_OR_RUN="${GITHUB_REF_NAME}"
+          if [ -z "$TAG_OR_RUN" ]; then
+            TAG_OR_RUN="build-${GITHUB_RUN_NUMBER}"
+          fi
+          mv build/app/outputs/flutter-apk/app-release.apk "praktikum_mp_04sife02_ammar-${TAG_OR_RUN}.apk"
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: praktikum_mp_04sife02_ammar-*.apk
+          generate_release_notes: true
+
+      - name: Upload APK artifact
+        if: "!startsWith(github.ref, 'refs/tags/v')"
+        uses: actions/upload-artifact@v4
+        with:
+          name: praktikum_mp_04sife02_ammar-apk
+          path: praktikum_mp_04sife02_ammar-*.apk
+          retention-days: 7
