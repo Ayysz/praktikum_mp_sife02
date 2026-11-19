@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag release (contoh: v1.0.11)'
+        required: false
+        default: 'v1.0.11'
 
 permissions:
   contents: write
@@ -34,29 +39,33 @@ jobs:
 
       - name: Build release APK
         run: |
-          BUILD_NAME="${GITHUB_REF_NAME#v}"
-          if [ -z "$BUILD_NAME" ] || [ "$BUILD_NAME" = "main" ]; then
-            BUILD_NAME="1.0.0"
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG_NAME="${{ github.ref_name }}"
+          else
+            TAG_NAME="${{ inputs.tag_name || 'v1.0.11' }}"
           fi
+          BUILD_NAME="${TAG_NAME#v}"
           flutter build apk --release --build-name="$BUILD_NAME" --build-number="${GITHUB_RUN_NUMBER}"
 
       - name: Rename APK
         run: |
-          TAG_OR_RUN="${GITHUB_REF_NAME}"
-          if [ -z "$TAG_OR_RUN" ]; then
-            TAG_OR_RUN="build-${GITHUB_RUN_NUMBER}"
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG_NAME="${{ github.ref_name }}"
+          else
+            TAG_NAME="${{ inputs.tag_name || 'v1.0.11' }}"
           fi
-          mv build/app/outputs/flutter-apk/app-release.apk "praktikum_mp_04sife02_ammar-${TAG_OR_RUN}.apk"
+          mv build/app/outputs/flutter-apk/app-release.apk "praktikum_mp_04sife02_ammar-${TAG_NAME}.apk"
+          echo "RELEASE_TAG=${TAG_NAME}" >> $GITHUB_ENV
 
       - name: Publish GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Release ${{ env.RELEASE_TAG }}
           files: praktikum_mp_04sife02_ammar-*.apk
           generate_release_notes: true
 
       - name: Upload APK artifact
-        if: "!startsWith(github.ref, 'refs/tags/v')"
         uses: actions/upload-artifact@v4
         with:
           name: praktikum_mp_04sife02_ammar-apk
