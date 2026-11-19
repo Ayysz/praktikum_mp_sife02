@@ -9,6 +9,7 @@ import 'package:praktikum_mp_04sife02_ammar/ptm7/task.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm8/order_page.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm9/todo_user_page.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm10/native_sensor_page.dart';
+import 'package:praktikum_mp_04sife02_ammar/ptm11/views/search_mahasiswa_page.dart';
 
 class Materi extends StatelessWidget {
   const Materi({super.key});
@@ -134,6 +135,13 @@ class Materi extends StatelessWidget {
         "icon": Icons.sensors,
         "subItems": [
           {'title': 'Kamera, GPS & Notifikasi', 'page': const NativeSensorPage(), 'icon': Icons.phone_android},
+        ]
+      },
+      {
+        "title": "Pertemuan 11 - Arsitektur MVVM & SearchView",
+        "icon": Icons.architecture,
+        "subItems": [
+          {'title': 'Latihan MVVM SearchView', 'page': const SearchMahasiswaPage(), 'icon': Icons.search},
         ]
       },
     ];
