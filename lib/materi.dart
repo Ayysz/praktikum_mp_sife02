@@ -10,6 +10,7 @@ import 'package:praktikum_mp_04sife02_ammar/ptm8/order_page.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm9/todo_user_page.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm10/native_sensor_page.dart';
 import 'package:praktikum_mp_04sife02_ammar/ptm11/views/search_mahasiswa_page.dart';
+import 'package:praktikum_mp_04sife02_ammar/ptm12/views/search_option_menu_page.dart';
 
 class Materi extends StatelessWidget {
   const Materi({super.key});
@@ -142,6 +143,13 @@ class Materi extends StatelessWidget {
         "icon": Icons.architecture,
         "subItems": [
           {'title': 'Latihan MVVM SearchView', 'page': const SearchMahasiswaPage(), 'icon': Icons.search},
+        ]
+      },
+      {
+        "title": "Pertemuan 12 - Search View & Option Menu",
+        "icon": Icons.menu_open,
+        "subItems": [
+          {'title': 'Katalog Produk & Option Menu', 'page': const SearchOptionMenuPage(), 'icon': Icons.manage_search},
         ]
       },
     ];
